@@ -1,8 +1,8 @@
-const App = () => {
+import '../../less/style.less';
+import BattleField from '../battle-field/battle-field';
 
-    return (
-        <div>fgfgfgfg</div>
-    )
+const App = () => {
+  return <BattleField />;
 };
 
 export default App;
