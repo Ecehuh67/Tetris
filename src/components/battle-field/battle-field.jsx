@@ -1,36 +1,22 @@
-import { FIELD_SIZE } from '../../consts';
-
-const BattleField = () => {
-  const elementCollection = new Set();
-  const elementRef = (elem) => {
-    elementCollection.add(elem);
-  };
-
-  // first position for figure on the top
-  let currentPosition = 4;
-
-  const fieldSquare = FIELD_SIZE.wide * FIELD_SIZE.height;
-
-  const draw = () => {
-    return null;
-  };
-
-  console.log(draw());
-
+const BattleField = ({ field }) => {
+  React.useEffect(() => {
+    console.log(field);
+  }, []);
   return (
-    <main className="html-wrapper main">
-      <section className="main__field">
-        {new Array(fieldSquare).fill('').map(() => {
-          return (
-            <div
-              className="main__field-item"
-              key={Math.random() * fieldSquare}
-              ref={elementRef}
-            />
-          );
-        })}
-      </section>
-    </main>
+    <section className="main__field">
+      {field.map((item) => {
+        return (
+          <div
+            className={
+              item.isClear
+                ? 'main__field-item'
+                : 'main__field-item main__field-item--tetramino'
+            }
+            key={new Date() * Math.random()}
+          />
+        );
+      })}
+    </section>
   );
 };
 

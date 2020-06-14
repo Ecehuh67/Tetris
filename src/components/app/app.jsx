@@ -1,8 +1,12 @@
 import '../../less/style.less';
-import BattleField from '../battle-field/battle-field';
+import Tetris from '../tetris/tetris';
 
 const App = () => {
-  return <BattleField />;
+  return (
+    <>
+      <Tetris />
+    </>
+  );
 };
 
 export default App;
