@@ -1,7 +1,6 @@
+import BottomField from '../bottom-field/bottom-field';
+
 const BattleField = ({ field }) => {
-  React.useEffect(() => {
-    console.log(field);
-  }, []);
   return (
     <section className="main__field">
       {field.map((item) => {
@@ -16,6 +15,8 @@ const BattleField = ({ field }) => {
           />
         );
       })}
+
+      <BottomField/>
     </section>
   );
 };
