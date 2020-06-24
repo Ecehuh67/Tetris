@@ -3,7 +3,7 @@ export const FIELD_SIZE = {
   height: 15,
 };
 
-export const COLORS = ['#fe4a49', '#2ab7ca', '#fed766 ', '#6497b1', '#e6e6ea'];
+export const COLORS = ['#FF00CC', '#2ab7ca', '#fed766 ', '#2243B6', '#e6e6ea'];
 
 export const lTetromino = [
   [1, 2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1],
