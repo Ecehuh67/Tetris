@@ -4,8 +4,16 @@ export const FIELD_SIZE = {
 };
 
 export const COLORS = ['#FF00CC', '#2ab7ca', '#fed766 ', '#2243B6', '#e6e6ea'];
+export const AMOUNT_OF_ROTATION = 4;
 
-export const lTetromino = [
+export const KEYBOARD_KEYS = {
+  right: 'ArrowRight',
+  left: 'ArrowLeft',
+  down: 'ArrowDown',
+  up: 'ArrowUp',
+};
+
+const lTetromino = [
   [1, 2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1],
   [
     FIELD_SIZE.wide,
@@ -22,26 +30,26 @@ export const lTetromino = [
   ],
 ];
 
-export const squareTetramino = [
+const squareTetramino = [
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
 ];
 
-export const tTetramino = [
+const tTetramino = [
   [1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
   [
     FIELD_SIZE.wide,
     FIELD_SIZE.wide + 1,
     FIELD_SIZE.wide + 2,
-    FIELD_SIZE.wide * 3 + 1,
+    FIELD_SIZE.wide * 2 + 1,
   ],
   [1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1],
 ];
 
-export const iTetramino = [
+const iTetramino = [
   [1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1, FIELD_SIZE.wide * 3 + 1],
   [
     FIELD_SIZE.wide,
@@ -58,9 +66,17 @@ export const iTetramino = [
   ],
 ];
 
-export const zTetramino = [
-  [FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1, FIELD_SIZE.wide * 2 + 2],
+const zTetramino = [
+  [0, 1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
-  [FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1, FIELD_SIZE.wide * 2 + 2],
+  [0, 1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
-]
+];
+
+export const tetraminos = [
+  lTetromino,
+  squareTetramino,
+  tTetramino,
+  iTetramino,
+  zTetramino,
+];

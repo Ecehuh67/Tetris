@@ -6,12 +6,13 @@ const BattleField = ({ field }) => {
       {field.map((item) => {
         return (
           <div
-            className={
-              `${item.isClear
+            className={`${
+              item.isClear
                 ? 'main__field-item'
-                : `main__field-item main__field-item--tetramino-${item.color.slice(1)}`} ${ 
-                item.isBottom? 'main__field-item--bottom' : ''}`
-            }
+                : `main__field-item main__field-item--tetramino-${item.color.slice(
+                    1
+                  )}`
+            } ${item.isBottom ? 'main__field-item--bottom' : ''}`}
             key={new Date() * Math.random()}
           />
         );
