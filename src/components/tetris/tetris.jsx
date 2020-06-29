@@ -8,23 +8,6 @@ import {
 } from '../../tetramino';
 
 const Tetris = () => {
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      draw();
-    }, 100);
-    const timer2 = setInterval(() => {
-      moveDown();
-      gameOver();
-      freeze();
-      draw();
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-      clearInterval(timer1);
-    };
-  }, []);
-
   // define amount of playground cells
   const fieldSquare = FIELD_SIZE.wide * FIELD_SIZE.height;
 
@@ -50,7 +33,7 @@ const Tetris = () => {
   let randomColor = generateRandomColor();
 
   //
-  let frozenTetramino = null;
+  // let frozenTetramino = null;
   let lowerPoint = null;
 
   const draw = () => {
@@ -86,22 +69,28 @@ const Tetris = () => {
     draw();
   };
 
+  // Stop the current tetramino near bottom/figure and create new one
   const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
     const bottomPoint =
       fieldCell.indexOf(fieldCell.find((it) => it.isBottom)) - FIELD_SIZE.wide;
 
-    frozenTetramino = Math.min(
-      ...fieldCell
-        .slice()
-        .filter((cell) => cell.isFrozen === true)
-        .map((it) => it.id)
-    );
+    const frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
+    const nextMove = currentPosition + FIELD_SIZE.wide;
 
-    if (
-      currentPosition + lowerPoint > bottomPoint ||
-      currentPosition + lowerPoint >= frozenTetramino - FIELD_SIZE.wide
-    ) {
+    // Define the next line from tetramino is free or there is a another figure
+    const isFree = currentTetramino
+      .map((it) => {
+        if (frozenCells.length === 0) {
+          return false;
+        }
+
+        return frozenCells.map((el) => el.id).includes(it + nextMove);
+      })
+      .every((item) => item === false);
+
+    // Stop tetramino
+    if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
       const current = currentTetramino.map((el) => el + currentPosition);
 
       setFieldCell(
@@ -113,6 +102,7 @@ const Tetris = () => {
         })
       );
 
+      // Reset current tetramino and create new one
       currentPosition = 4;
       currentFigure = createRandomFigure();
       currentTetramino = currentFigure[currentRotation];
@@ -161,6 +151,23 @@ const Tetris = () => {
       draw();
     }
   };
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      draw();
+    }, 100);
+    const timer2 = setInterval(() => {
+      moveDown();
+      gameOver();
+      freeze();
+      draw();
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(timer2);
+    };
+  }, []);
 
   React.useEffect(() => {
     document.addEventListener('keydown', onKeyDown);
