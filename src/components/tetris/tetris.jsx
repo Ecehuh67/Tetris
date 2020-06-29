@@ -36,6 +36,10 @@ const Tetris = () => {
   // let frozenTetramino = null;
   let lowerPoint = null;
 
+  const getCurrentPosition = (tetramino) => {
+    return tetramino.map((el) => el + currentPosition);
+  };
+
   const draw = () => {
     setFieldCell(
       fieldCell.map((item) => {
@@ -91,7 +95,7 @@ const Tetris = () => {
 
     // Stop tetramino
     if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
-      const current = currentTetramino.map((el) => el + currentPosition);
+      const current = getCurrentPosition(currentTetramino);
 
       setFieldCell(
         fieldCell.map((item) => {
@@ -115,10 +119,17 @@ const Tetris = () => {
   };
 
   const moveRight = () => {
+    if ((currentPosition + lowerPoint + 1) % 10 === 0) {
+      return;
+    }
     currentPosition += 1;
   };
 
   const moveLeft = () => {
+    const current = getCurrentPosition(currentTetramino);
+    if (current.some((it) => it % FIELD_SIZE.wide === 0)) {
+      return;
+    }
     currentPosition -= 1;
   };
 
