@@ -1,5 +1,5 @@
 import BattleField from '../battle-field/battle-field';
-import { FIELD_SIZE, KEYBOARD_KEYS } from '../../consts';
+import { FIELD_SIZE, KEYBOARD_KEYS, allTetraminos } from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -34,6 +34,7 @@ const Tetris = () => {
 
   //
   // let frozenTetramino = null;
+  let frozenCells = [];
   let lowerPoint = null;
 
   const getCurrentPosition = (tetramino) => {
@@ -79,7 +80,7 @@ const Tetris = () => {
     const bottomPoint =
       fieldCell.indexOf(fieldCell.find((it) => it.isBottom)) - FIELD_SIZE.wide;
 
-    const frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
+    frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
     const nextMove = currentPosition + FIELD_SIZE.wide;
 
     // Define the next line from tetramino is free or there is a another figure
@@ -119,7 +120,8 @@ const Tetris = () => {
   };
 
   const moveRight = () => {
-    if ((currentPosition + lowerPoint + 1) % 10 === 0) {
+    const current = getCurrentPosition(currentTetramino);
+    if (current.some((it) => (it +1) % FIELD_SIZE.wide === 0)) {
       return;
     }
     currentPosition += 1;
@@ -133,11 +135,41 @@ const Tetris = () => {
     currentPosition -= 1;
   };
 
+  // Speed Tetramino in 2 times
   const throwDown = () => {
-    currentPosition += FIELD_SIZE.wide * 2;
+    const nextStep = currentPosition + FIELD_SIZE.wide * 3;
+    const isFree = currentTetramino
+      .map((it) => {
+        if (frozenCells.length === 0) {
+          return false;
+        }
+
+        return frozenCells.map((el) => el.id).includes(it + nextStep);
+      })
+      .every((item) => item === false);
+
+    if(isFree && nextStep + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
+      currentPosition += FIELD_SIZE.wide * 2;
+    }
   };
 
   const rorateFigure = () => {
+    const current = getCurrentPosition(currentTetramino);
+
+    const isExist = allTetraminos.some((it) => {
+      return it.toString() === smth
+    })
+
+    // if (current.some((it) => it % FIELD_SIZE.wide === 0)) {
+    //   return;
+    // }
+
+    // if (current.some((it => (it + currentPosition + 3) % FIELD_SIZE.wide === 0 )))
+    //     // || current.some((it => (currentPosition - it - 1) % FIELD_SIZE.wide > 0 )))
+    //  {
+    //   return;
+    // }
+
     changeCurrentRotation();
     currentTetramino = currentFigure[currentRotation];
   };
@@ -172,7 +204,7 @@ const Tetris = () => {
       gameOver();
       freeze();
       draw();
-    }, 500);
+    }, 1500);
 
     return () => {
       clearTimeout(timer);
