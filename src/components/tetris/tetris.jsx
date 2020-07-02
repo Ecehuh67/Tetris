@@ -1,5 +1,5 @@
 import BattleField from '../battle-field/battle-field';
-import { FIELD_SIZE, KEYBOARD_KEYS, allTetraminos } from '../../consts';
+import { FIELD_SIZE, KEYBOARD_KEYS} from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -154,21 +154,13 @@ const Tetris = () => {
   };
 
   const rorateFigure = () => {
-    const current = getCurrentPosition(currentTetramino);
+    const nextRotation = currentFigure[currentRotation + 1 > 3 ? 0 : currentRotation + 1].map(it => it + currentPosition)
+    const isRight = nextRotation.map(it => it % 10 === 0).every(it => it === false);
+    const isLeft = nextRotation.map(it => (it + 1) % 10 === 0).every(it => it === false);
 
-    const isExist = allTetraminos.some((it) => {
-      return it.toString() === smth
-    })
-
-    // if (current.some((it) => it % FIELD_SIZE.wide === 0)) {
-    //   return;
-    // }
-
-    // if (current.some((it => (it + currentPosition + 3) % FIELD_SIZE.wide === 0 )))
-    //     // || current.some((it => (currentPosition - it - 1) % FIELD_SIZE.wide > 0 )))
-    //  {
-    //   return;
-    // }
+    if (!isLeft) {
+      return;
+    }
 
     changeCurrentRotation();
     currentTetramino = currentFigure[currentRotation];

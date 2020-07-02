@@ -80,5 +80,3 @@ export const tetraminos = [
   iTetramino,
   zTetramino,
 ];
-
-export const allTetraminos = [].concat(lTetromino).concat(squareTetramino).concat(tTetramino).concat(iTetramino).concat(zTetramino);
