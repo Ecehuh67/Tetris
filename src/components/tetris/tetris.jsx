@@ -1,5 +1,5 @@
 import BattleField from '../battle-field/battle-field';
-import { FIELD_SIZE, KEYBOARD_KEYS} from '../../consts';
+import { FIELD_SIZE, KEYBOARD_KEYS } from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -121,7 +121,7 @@ const Tetris = () => {
 
   const moveRight = () => {
     const current = getCurrentPosition(currentTetramino);
-    if (current.some((it) => (it +1) % FIELD_SIZE.wide === 0)) {
+    if (current.some((it) => (it + 1) % FIELD_SIZE.wide === 0)) {
       return;
     }
     currentPosition += 1;
@@ -148,17 +148,27 @@ const Tetris = () => {
       })
       .every((item) => item === false);
 
-    if(isFree && nextStep + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
+    if (isFree && nextStep + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
       currentPosition += FIELD_SIZE.wide * 2;
     }
   };
 
-  const rorateFigure = () => {
-    const nextRotation = currentFigure[currentRotation + 1 > 3 ? 0 : currentRotation + 1].map(it => it + currentPosition)
-    const isRight = nextRotation.map(it => it % 10 === 0).every(it => it === false);
-    const isLeft = nextRotation.map(it => (it + 1) % 10 === 0).every(it => it === false);
+  const rotateFigure = () => {
+    const nextRotation = currentFigure[
+      currentRotation + 1 > 3 ? 0 : currentRotation + 1
+    ].map((it) => it + currentPosition);
 
-    if (!isLeft) {
+    const isRight = nextRotation
+      .map((it) => it % FIELD_SIZE.wide === 0)
+      .every((it) => it === false);
+    const isLeft = nextRotation
+      .map((it) => (it + 1) % FIELD_SIZE.wide === 0)
+      .every((it) => it === false);
+
+    if ((currentPosition + 1) % FIELD_SIZE.wide < 4 && !isLeft) {
+      return;
+    }
+    if (currentPosition % FIELD_SIZE.wide > 5 && !isRight) {
       return;
     }
 
@@ -182,7 +192,7 @@ const Tetris = () => {
       draw();
     } else if (key === KEYBOARD_KEYS.up) {
       undraw();
-      rorateFigure();
+      rotateFigure();
       draw();
     }
   };
@@ -196,7 +206,7 @@ const Tetris = () => {
       gameOver();
       freeze();
       draw();
-    }, 1500);
+    }, 15000);
 
     return () => {
       clearTimeout(timer);
