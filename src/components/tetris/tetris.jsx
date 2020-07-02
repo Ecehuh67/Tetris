@@ -154,6 +154,7 @@ const Tetris = () => {
   };
 
   const rotateFigure = () => {
+    // Find next rotation of current tetramino
     const nextRotation = currentFigure[
       currentRotation + 1 > 3 ? 0 : currentRotation + 1
     ].map((it) => it + currentPosition);
