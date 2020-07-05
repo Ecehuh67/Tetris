@@ -25,6 +25,7 @@ const Tetris = () => {
 
   // rerender State
   const [fieldCell, setFieldCell] = React.useState(initialFieldCells);
+  const [score, setScore] = React.useState(0);
 
   // entry options of the game
   let currentPosition = 4;
@@ -54,7 +55,7 @@ const Tetris = () => {
     );
   };
 
-  const undraw = () => {
+  const erase = () => {
     const current = currentTetramino.map((it) => it + currentPosition);
 
     setFieldCell(
@@ -69,7 +70,7 @@ const Tetris = () => {
   };
 
   const moveDown = () => {
-    undraw();
+    erase();
     currentPosition += FIELD_SIZE.wide;
     draw();
   };
@@ -113,10 +114,6 @@ const Tetris = () => {
       currentTetramino = currentFigure[currentRotation];
       randomColor = generateRandomColor();
     }
-  };
-
-  const gameOver = () => {
-    const figure = currentPosition + lowerPoint + FIELD_SIZE.wide + 1;
   };
 
   const moveRight = () => {
@@ -166,10 +163,13 @@ const Tetris = () => {
       .map((it) => (it + 1) % FIELD_SIZE.wide === 0)
       .every((it) => it === false);
 
-    if ((currentPosition + 1) % FIELD_SIZE.wide < 4 && !isLeft) {
+    if (
+      (currentPosition + 1) % FIELD_SIZE.wide < FIELD_SIZE.wide / 2 &&
+      !isLeft
+    ) {
       return;
     }
-    if (currentPosition % FIELD_SIZE.wide > 5 && !isRight) {
+    if (currentPosition % FIELD_SIZE.wide > FIELD_SIZE.wide / 2 && !isRight) {
       return;
     }
 
@@ -177,22 +177,84 @@ const Tetris = () => {
     currentTetramino = currentFigure[currentRotation];
   };
 
+  const addScore = () => {
+    let counter = 0;
+    const lines = new Array(FIELD_SIZE.height).fill([]).map((it) => {
+      counter += FIELD_SIZE.wide;
+      return fieldCell.slice(
+        counter === FIELD_SIZE.wide ? 0 : counter - FIELD_SIZE.wide,
+        counter
+      );
+    });
+
+    const isFulled = lines.map((line) => {
+      return line.map((it) => it.isClear).every((item) => item === false);
+    });
+    const numberFulledLine = isFulled.indexOf(true);
+
+    if (numberFulledLine !== -1) {
+      // const newArray = lines[numberFulledLine].map((it) => {
+      //   return {
+      //     ...it,
+      //     isClear: true,
+      //     color: null,
+      //   };
+      // });
+
+      console.log(fieldCell);
+
+      const emptyLine = new Array(FIELD_SIZE.wide).fill('').map((item, i) => {
+        return {
+          id: i,
+          isClear: true,
+          color: null,
+          isFrozen: false,
+          isBottom: false,
+        };
+      });
+
+      const minIndex = numberFulledLine * FIELD_SIZE.wide;
+
+      const newArray = fieldCell.slice();
+      newArray.splice(minIndex, minIndex + FIELD_SIZE.wide - 1);
+      console.log(newArray);
+      newArray.forEach((item, i) => {
+        if (i < FIELD_SIZE.wide) {
+          newArray.unshift(emptyLine[i]);
+        }
+      });
+      newArray.map((el, i) => {
+        return {
+          ...el,
+          id: i,
+        };
+      });
+
+      setFieldCell(newArray);
+      console.log(newArray);
+    }
+
+    // setScore((prev) => prev + 10);
+
+    return null;
+  };
+
   const onKeyDown = (evt) => {
     const { key } = evt;
     if (key === KEYBOARD_KEYS.right) {
-      undraw();
+      erase();
       moveRight();
       draw();
     } else if (key === KEYBOARD_KEYS.left) {
-      undraw();
+      erase();
       moveLeft();
       draw();
     } else if (key === KEYBOARD_KEYS.down) {
-      undraw();
+      erase();
       throwDown();
       draw();
     } else if (key === KEYBOARD_KEYS.up) {
-      undraw();
+      erase();
       rotateFigure();
       draw();
     }
@@ -204,10 +266,10 @@ const Tetris = () => {
     }, 100);
     const timer2 = setInterval(() => {
       moveDown();
-      gameOver();
+      addScore();
       freeze();
       draw();
-    }, 15000);
+    }, 500);
 
     return () => {
       clearTimeout(timer);
