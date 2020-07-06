@@ -73,47 +73,7 @@ const Tetris = () => {
     erase();
     currentPosition += FIELD_SIZE.wide;
     draw();
-  };
-
-  // Stop the current tetramino near bottom/figure and create new one
-  const freeze = () => {
-    lowerPoint = Math.max(...currentTetramino);
-    const bottomPoint =
-      fieldCell.indexOf(fieldCell.find((it) => it.isBottom)) - FIELD_SIZE.wide;
-
-    frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
-    const nextMove = currentPosition + FIELD_SIZE.wide;
-
-    // Define the next line from tetramino is free or there is a another figure
-    const isFree = currentTetramino
-      .map((it) => {
-        if (frozenCells.length === 0) {
-          return false;
-        }
-
-        return frozenCells.map((el) => el.id).includes(it + nextMove);
-      })
-      .every((item) => item === false);
-
-    // Stop tetramino
-    if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
-      const current = getCurrentPosition(currentTetramino);
-
-      setFieldCell(
-        fieldCell.map((item) => {
-          if (current.some((el) => el === item.id)) {
-            item.isFrozen = true;
-          }
-          return item;
-        })
-      );
-
-      // Reset current tetramino and create new one
-      currentPosition = 4;
-      currentFigure = createRandomFigure();
-      currentTetramino = currentFigure[currentRotation];
-      randomColor = generateRandomColor();
-    }
+    freeze();
   };
 
   const moveRight = () => {
@@ -164,12 +124,9 @@ const Tetris = () => {
       .every((it) => it === false);
 
     if (
-      (currentPosition + 1) % FIELD_SIZE.wide < FIELD_SIZE.wide / 2 &&
-      !isLeft
-    ) {
-      return;
-    }
-    if (currentPosition % FIELD_SIZE.wide > FIELD_SIZE.wide / 2 && !isRight) {
+      ((currentPosition + 1) % FIELD_SIZE.wide < FIELD_SIZE.wide / 2 &&
+      !isLeft)
+     || (currentPosition % FIELD_SIZE.wide > FIELD_SIZE.wide / 2 && !isRight)) {
       return;
     }
 
@@ -179,7 +136,7 @@ const Tetris = () => {
 
   const addScore = () => {
     let counter = 0;
-    const lines = new Array(FIELD_SIZE.height).fill([]).map((it) => {
+    const lines = new Array(FIELD_SIZE.height).fill([]).map((__) => {
       counter += FIELD_SIZE.wide;
       return fieldCell.slice(
         counter === FIELD_SIZE.wide ? 0 : counter - FIELD_SIZE.wide,
@@ -193,16 +150,7 @@ const Tetris = () => {
     const numberFulledLine = isFulled.indexOf(true);
 
     if (numberFulledLine !== -1) {
-      // const newArray = lines[numberFulledLine].map((it) => {
-      //   return {
-      //     ...it,
-      //     isClear: true,
-      //     color: null,
-      //   };
-      // });
-
-      console.log(fieldCell);
-
+      console.log('line')
       const emptyLine = new Array(FIELD_SIZE.wide).fill('').map((item, i) => {
         return {
           id: i,
@@ -215,28 +163,64 @@ const Tetris = () => {
 
       const minIndex = numberFulledLine * FIELD_SIZE.wide;
 
-      const newArray = fieldCell.slice();
-      newArray.splice(minIndex, minIndex + FIELD_SIZE.wide - 1);
-      console.log(newArray);
-      newArray.forEach((item, i) => {
+      const newData = fieldCell.slice()
+      newData.splice(minIndex, FIELD_SIZE.wide);
+      newData.forEach((__, i) => {
         if (i < FIELD_SIZE.wide) {
-          newArray.unshift(emptyLine[i]);
+          newData.unshift(emptyLine[i]);
         }
       });
-      newArray.map((el, i) => {
-        return {
-          ...el,
-          id: i,
-        };
+      newData.forEach((el, i) => {
+        el.id = i
       });
 
-      setFieldCell(newArray);
-      console.log(newArray);
+      setFieldCell(newData)
+      setScore((prev) => prev + 10);
+    }
+  };
+
+  // Stop the current tetramino near bottom/figure and create new one
+  const freeze = () => {
+    lowerPoint = Math.max(...currentTetramino);
+    const bottomPoint =
+      fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) - FIELD_SIZE.wide;
+
+    frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
+    const nextMove = currentPosition + FIELD_SIZE.wide;
+
+    // Define the next line from tetramino is free or there is a another figure
+    const isFree = currentTetramino
+      .map((it) => {
+        if (frozenCells.length === 0) {
+          return false;
+        }
+
+        return frozenCells.map((el) => el.id).includes(it + nextMove);
+      })
+      .every((item) => item === false);
+
+    // Stop tetramino
+    if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
+      const current = getCurrentPosition(currentTetramino);
+
+      setFieldCell(
+        fieldCell.map((item) => {
+          if (current.some((el) => el === item.id)) {
+            item.isFrozen = true;
+          }
+          return item;
+        })
+      );
+
+      // Reset current tetramino and create new one
+      currentPosition = 4;
+      currentFigure = createRandomFigure();
+      currentTetramino = currentFigure[currentRotation];
+      randomColor = generateRandomColor();
+
+      addScore()
     }
 
-    // setScore((prev) => prev + 10);
-
-    return null;
   };
 
   const onKeyDown = (evt) => {
@@ -266,9 +250,6 @@ const Tetris = () => {
     }, 100);
     const timer2 = setInterval(() => {
       moveDown();
-      addScore();
-      freeze();
-      draw();
     }, 500);
 
     return () => {
