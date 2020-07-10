@@ -1,5 +1,3 @@
-import BottomField from '../bottom-field/bottom-field';
-
 const BattleField = ({ field }) => {
   return (
     <section className="main__field">

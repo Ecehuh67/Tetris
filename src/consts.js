@@ -5,6 +5,7 @@ export const FIELD_SIZE = {
 
 export const COLORS = ['#ff1d58', '#0049B7', '#fff685', '#8458B3', '#f37736'];
 export const AMOUNT_OF_ROTATION = 4;
+export const SCORE_VALUE = 10;
 
 export const KEYBOARD_KEYS = {
   right: 'ArrowRight',

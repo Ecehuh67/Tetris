@@ -1,5 +1,6 @@
 import BattleField from '../battle-field/battle-field';
-import { FIELD_SIZE, KEYBOARD_KEYS } from '../../consts';
+import UserDashboard from '../user-dashboard/user-dashboard';
+import { FIELD_SIZE, KEYBOARD_KEYS, SCORE_VALUE } from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -26,6 +27,7 @@ const Tetris = () => {
   // rerender State
   const [fieldCell, setFieldCell] = React.useState(initialFieldCells);
   const [score, setScore] = React.useState(0);
+  const [nextTetramino, setNextTetramino] = React.useState(null);
 
   // entry options of the game
   let currentPosition = 4;
@@ -33,8 +35,6 @@ const Tetris = () => {
   let currentTetramino = currentFigure[currentRotation];
   let randomColor = generateRandomColor();
 
-  //
-  // let frozenTetramino = null;
   let frozenCells = [];
   let lowerPoint = null;
 
@@ -125,8 +125,9 @@ const Tetris = () => {
 
     if (
       ((currentPosition + 1) % FIELD_SIZE.wide < FIELD_SIZE.wide / 2 &&
-      !isLeft)
-     || (currentPosition % FIELD_SIZE.wide > FIELD_SIZE.wide / 2 && !isRight)) {
+        !isLeft) ||
+      (currentPosition % FIELD_SIZE.wide > FIELD_SIZE.wide / 2 && !isRight)
+    ) {
       return;
     }
 
@@ -147,35 +148,53 @@ const Tetris = () => {
     const isFulled = lines.map((line) => {
       return line.map((it) => it.isClear).every((item) => item === false);
     });
-    const numberFulledLine = isFulled.indexOf(true);
 
-    if (numberFulledLine !== -1) {
-      console.log('line')
-      const emptyLine = new Array(FIELD_SIZE.wide).fill('').map((item, i) => {
-        return {
-          id: i,
-          isClear: true,
-          color: null,
-          isFrozen: false,
-          isBottom: false,
-        };
-      });
+    // console.log(isFulled);
+    const numberFulledLines = isFulled
+      .map((it, i) => {
+        if (it === true) {
+          return i;
+        }
+        return '';
+      })
+      .filter((it) => it !== '');
 
-      const minIndex = numberFulledLine * FIELD_SIZE.wide;
+    if (numberFulledLines.length > 0) {
+      const emptyLine = new Array(FIELD_SIZE.wide * numberFulledLines.length)
+        .fill('')
+        .map((item, i) => {
+          return {
+            id: i,
+            isClear: true,
+            color: null,
+            isFrozen: false,
+            isBottom: false,
+          };
+        });
 
-      const newData = fieldCell.slice()
-      newData.splice(minIndex, FIELD_SIZE.wide);
-      newData.forEach((__, i) => {
-        if (i < FIELD_SIZE.wide) {
-          newData.unshift(emptyLine[i]);
+      // Delete fulled lines
+      numberFulledLines.forEach((line, i) => {
+        if (i > 0) {
+          fieldCell.splice(
+            line * FIELD_SIZE.wide - i * FIELD_SIZE.wide,
+            FIELD_SIZE.wide
+          );
+        } else {
+          fieldCell.splice(line * FIELD_SIZE.wide, FIELD_SIZE.wide);
         }
       });
-      newData.forEach((el, i) => {
-        el.id = i
+
+      // Paste empty lines instead of fulled at the start
+      fieldCell.forEach((__, i) => {
+        if (i < FIELD_SIZE.wide * numberFulledLines.length) {
+          fieldCell.unshift(emptyLine[i]);
+        }
+      });
+      fieldCell.forEach((el, i) => {
+        el.id = i;
       });
 
-      setFieldCell(newData)
-      setScore((prev) => prev + 10);
+      setScore((prev) => prev + numberFulledLines.length * SCORE_VALUE);
     }
   };
 
@@ -183,7 +202,8 @@ const Tetris = () => {
   const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
     const bottomPoint =
-      fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) - FIELD_SIZE.wide;
+      fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) -
+      FIELD_SIZE.wide;
 
     frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
     const nextMove = currentPosition + FIELD_SIZE.wide;
@@ -218,9 +238,13 @@ const Tetris = () => {
       currentTetramino = currentFigure[currentRotation];
       randomColor = generateRandomColor();
 
-      addScore()
-    }
+      setNextTetramino({
+        figure: currentTetramino,
+        color: randomColor,
+      });
 
+      addScore();
+    }
   };
 
   const onKeyDown = (evt) => {
@@ -265,6 +289,11 @@ const Tetris = () => {
   return (
     <main className="html-wrapper main">
       <BattleField field={fieldCell} />
+      <UserDashboard
+        score={score}
+        color={randomColor}
+        nextFigure={nextTetramino}
+      />
     </main>
   );
 };
