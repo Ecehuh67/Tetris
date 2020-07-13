@@ -35,6 +35,19 @@ const Tetris = () => {
   let currentTetramino = currentFigure[currentRotation];
   let randomColor = generateRandomColor();
 
+  let followingFigure = createRandomFigure();
+  let followingTetramino = followingFigure[currentRotation];
+  let followingColor = generateRandomColor();
+
+  if (nextTetramino === null) {
+    setNextTetramino({
+      figure: followingFigure,
+      tetramino: followingTetramino,
+      color: followingColor,
+      isFirst: true,
+    });
+  }
+
   let frozenCells = [];
   let lowerPoint = null;
 
@@ -234,13 +247,26 @@ const Tetris = () => {
 
       // Reset current tetramino and create new one
       currentPosition = 4;
-      currentFigure = createRandomFigure();
-      currentTetramino = currentFigure[currentRotation];
-      randomColor = generateRandomColor();
+
+      currentFigure = nextTetramino.figure;
+      currentTetramino = nextTetramino.tetramino;
+      randomColor = nextTetramino.color;
+
+      console.log(nextTetramino);
+
+      // currentFigure = followingFigure;
+      // currentTetramino = followingTetramino;
+      // randomColor = followingColor;
+
+      followingFigure = createRandomFigure();
+      followingTetramino = followingFigure[currentRotation];
+      followingColor = generateRandomColor();
 
       setNextTetramino({
-        figure: currentTetramino,
-        color: randomColor,
+        figure: followingFigure,
+        tetramino: followingTetramino,
+        color: followingColor,
+        isFirst: false,
       });
 
       addScore();

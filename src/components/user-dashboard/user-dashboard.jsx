@@ -11,7 +11,7 @@ const UserDashboard = ({ score, color, nextFigure }) => {
   let convertedFigure = null;
 
   if (nextFigure !== null) {
-    convertedFigure = nextFigure.figure.map((cor) => {
+    convertedFigure = nextFigure.tetramino.map((cor) => {
       if (nextFigure === null) {
         return;
       }
