@@ -1,6 +1,11 @@
 import BattleField from '../battle-field/battle-field';
 import UserDashboard from '../user-dashboard/user-dashboard';
-import { FIELD_SIZE, KEYBOARD_KEYS, SCORE_VALUE, tetraminos } from '../../consts';
+import {
+  FIELD_SIZE,
+  KEYBOARD_KEYS,
+  SCORE_VALUE,
+  tetraminos,
+} from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -28,7 +33,7 @@ const Tetris = () => {
   const [fieldCell, setFieldCell] = React.useState(initialFieldCells);
   const [score, setScore] = React.useState(0);
   const [nextTetramino, setNextTetramino] = React.useState(null);
-  const [func, SetFunc] = React.useState(null)
+  const [isGameOver, setGameOver] = React.useState(false);
 
   // entry options of the game
   let currentPosition = 4;
@@ -203,8 +208,8 @@ const Tetris = () => {
     }
   };
 
-   // Stop the current tetramino near bottom/figure and create new one
-   const freeze = () => {
+  // Stop the current tetramino near bottom/figure and create new one
+  const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
     const bottomPoint =
       fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) -
@@ -248,7 +253,6 @@ const Tetris = () => {
       followingTetramino = followingFigure[currentRotation];
       followingColor = generateRandomColor();
 
-
       setNextTetramino({
         figure: followingFigure,
         tetramino: followingTetramino,
@@ -260,7 +264,23 @@ const Tetris = () => {
     }
   };
 
-  
+  const gameOver = () => {
+    const nextMove = currentPosition + FIELD_SIZE.wide;
+    const isFree = currentTetramino
+      .map((it) => {
+        if (frozenCells.length === 0) {
+          return false;
+        }
+
+        return frozenCells.map((el) => el.id).includes(it + nextMove);
+      })
+      .every((item) => item === false);
+
+    if (!isFree) {
+      currentTetramino = [];
+      setGameOver(true);
+    }
+  };
 
   const onKeyDown = (evt) => {
     const { key } = evt;
@@ -288,6 +308,7 @@ const Tetris = () => {
       draw();
     }, 100);
     const timer2 = setInterval(() => {
+      gameOver();
       moveDown();
     }, 500);
 
@@ -304,7 +325,7 @@ const Tetris = () => {
       setNextTetramino({
         figure: followingFigure,
         tetramino: followingTetramino,
-        color: followingColor
+        color: followingColor,
       });
     }
   }, []);
@@ -317,6 +338,8 @@ const Tetris = () => {
         color={randomColor}
         nextFigure={nextTetramino}
       />
+
+      {isGameOver && <p>GAME OVER</p>}
     </main>
   );
 };
