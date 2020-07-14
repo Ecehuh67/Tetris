@@ -1,6 +1,6 @@
 import BattleField from '../battle-field/battle-field';
 import UserDashboard from '../user-dashboard/user-dashboard';
-import { FIELD_SIZE, KEYBOARD_KEYS, SCORE_VALUE } from '../../consts';
+import { FIELD_SIZE, KEYBOARD_KEYS, SCORE_VALUE, tetraminos } from '../../consts';
 import {
   createRandomFigure,
   generateRandomColor,
@@ -28,6 +28,7 @@ const Tetris = () => {
   const [fieldCell, setFieldCell] = React.useState(initialFieldCells);
   const [score, setScore] = React.useState(0);
   const [nextTetramino, setNextTetramino] = React.useState(null);
+  const [func, SetFunc] = React.useState(null)
 
   // entry options of the game
   let currentPosition = 4;
@@ -38,15 +39,6 @@ const Tetris = () => {
   let followingFigure = createRandomFigure();
   let followingTetramino = followingFigure[currentRotation];
   let followingColor = generateRandomColor();
-
-  if (nextTetramino === null) {
-    setNextTetramino({
-      figure: followingFigure,
-      tetramino: followingTetramino,
-      color: followingColor,
-      isFirst: true,
-    });
-  }
 
   let frozenCells = [];
   let lowerPoint = null;
@@ -211,8 +203,8 @@ const Tetris = () => {
     }
   };
 
-  // Stop the current tetramino near bottom/figure and create new one
-  const freeze = () => {
+   // Stop the current tetramino near bottom/figure and create new one
+   const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
     const bottomPoint =
       fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) -
@@ -248,30 +240,27 @@ const Tetris = () => {
       // Reset current tetramino and create new one
       currentPosition = 4;
 
-      currentFigure = nextTetramino.figure;
-      currentTetramino = nextTetramino.tetramino;
-      randomColor = nextTetramino.color;
-
-      console.log(nextTetramino);
-
-      // currentFigure = followingFigure;
-      // currentTetramino = followingTetramino;
-      // randomColor = followingColor;
+      currentFigure = followingFigure;
+      currentTetramino = followingTetramino;
+      randomColor = followingColor;
 
       followingFigure = createRandomFigure();
       followingTetramino = followingFigure[currentRotation];
       followingColor = generateRandomColor();
 
+
       setNextTetramino({
         figure: followingFigure,
         tetramino: followingTetramino,
         color: followingColor,
-        isFirst: false,
+        isFirst: true,
       });
 
       addScore();
     }
   };
+
+  
 
   const onKeyDown = (evt) => {
     const { key } = evt;
@@ -310,6 +299,14 @@ const Tetris = () => {
 
   React.useEffect(() => {
     document.addEventListener('keydown', onKeyDown);
+
+    if (nextTetramino === null) {
+      setNextTetramino({
+        figure: followingFigure,
+        tetramino: followingTetramino,
+        color: followingColor
+      });
+    }
   }, []);
 
   return (
