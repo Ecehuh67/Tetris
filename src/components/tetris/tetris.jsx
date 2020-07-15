@@ -40,17 +40,30 @@ const Tetris = () => {
   let currentFigure = createRandomFigure();
   let currentTetramino = currentFigure[currentRotation];
   let randomColor = generateRandomColor();
-
+  
+  // create next tetramino for showing into user's dashboard
   let followingFigure = createRandomFigure();
   let followingTetramino = followingFigure[currentRotation];
   let followingColor = generateRandomColor();
 
+  // Cells which were colored by tetraminos
   let frozenCells = [];
+
+  // The lowest point of tetramino
   let lowerPoint = null;
 
+  // Get coords of tetramino
   const getCurrentPosition = (tetramino) => {
     return tetramino.map((el) => el + currentPosition);
   };
+
+  // Check empty cells near a current tetramino (right/left)
+  const checkFreePosition = (tetramino, step) => {
+    return tetramino.map((it) => {
+      return fieldCell[step === 'right' ? it + 1 : it - 1].isFrozen
+    }).every((item) => item === false)
+  }
+
 
   const draw = () => {
     setFieldCell(
@@ -88,7 +101,9 @@ const Tetris = () => {
 
   const moveRight = () => {
     const current = getCurrentPosition(currentTetramino);
-    if (current.some((it) => (it + 1) % FIELD_SIZE.wide === 0)) {
+
+    // Define the right edge of playground and also check possibility of changing position to right on 1 step
+    if (current.some((it) => (it + 1) % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'right')) {
       return;
     }
     currentPosition += 1;
@@ -96,7 +111,9 @@ const Tetris = () => {
 
   const moveLeft = () => {
     const current = getCurrentPosition(currentTetramino);
-    if (current.some((it) => it % FIELD_SIZE.wide === 0)) {
+
+    // Define the right edge of playground and also check possibility of changing position to left on 1 step
+    if (current.some((it) => it % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'left')) {
       return;
     }
     currentPosition -= 1;
@@ -265,18 +282,10 @@ const Tetris = () => {
   };
 
   const gameOver = () => {
-    const nextMove = currentPosition + FIELD_SIZE.wide;
-    const isFree = currentTetramino
-      .map((it) => {
-        if (frozenCells.length === 0) {
-          return false;
-        }
+    const current = getCurrentPosition(currentTetramino);
+    const isEmpty = current.map((it) => fieldCell[it].isFrozen).every((el) => el === false)
 
-        return frozenCells.map((el) => el.id).includes(it + nextMove);
-      })
-      .every((item) => item === false);
-
-    if (!isFree) {
+    if (!isEmpty) {
       currentTetramino = [];
       setGameOver(true);
     }
@@ -304,16 +313,16 @@ const Tetris = () => {
   };
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      draw();
-    }, 100);
+    // const timer = setTimeout(() => {
+    //   draw();
+    // }, 100);
     const timer2 = setInterval(() => {
-      gameOver();
       moveDown();
+      gameOver();
     }, 500);
 
     return () => {
-      clearTimeout(timer);
+      // clearTimeout(timer);
       clearInterval(timer2);
     };
   }, []);
