@@ -1,5 +1,6 @@
 import { tetraminos, COLORS, AMOUNT_OF_ROTATION } from './consts';
 
+// eslint-disable-next-line import/no-mutable-exports
 export let currentRotation = 0;
 
 export const createRandomFigure = () => {

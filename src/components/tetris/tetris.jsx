@@ -4,7 +4,7 @@ import {
   FIELD_SIZE,
   KEYBOARD_KEYS,
   SCORE_VALUE,
-  tetraminos,
+  AMOUNT_OF_ROTATION,
 } from '../../consts';
 import {
   createRandomFigure,
@@ -54,58 +54,57 @@ const Tetris = () => {
 
   // Get coords of tetramino
   const getCurrentPosition = (tetramino) => {
-    return tetramino.map((el) => el + currentPosition);
+    return tetramino.map((coord) => coord + currentPosition);
   };
 
   // Check empty cells near a current tetramino (right/left)
   const checkFreePosition = (tetramino, step) => {
-    return tetramino.map((it) => {
-      return fieldCell[step === 'right' ? it + 1 : it - 1].isFrozen
-    }).every((item) => item === false)
+    return tetramino.map((coord) => {
+      return fieldCell[step === 'right' ? coord + 1 : coord - 1].isFrozen
+    }).every((frozenCell) => frozenCell === false)
   }
 
-
+  // Draw current tetramino onto the field
   const draw = () => {
     setFieldCell(
-      fieldCell.map((item) => {
-        if (currentTetramino.some((el) => el + currentPosition === item.id)) {
-          item.isClear = false;
-          item.color = randomColor;
+      fieldCell.map((cell) => {
+        const copiedCell = cell;
+        
+        if (currentTetramino.some((coord) => coord + currentPosition === cell.id)) {
+          copiedCell.isClear = false;
+          copiedCell.color = randomColor;
         }
 
-        return item;
+        return cell;
       })
     );
   };
 
+  // Delete current tetramino from the field
   const erase = () => {
     const current = currentTetramino.map((it) => it + currentPosition);
 
     setFieldCell(
-      fieldCell.map((item) => {
-        if (current.some((it) => it === item.id)) {
-          item.isClear = true;
-          item.color = null;
+      fieldCell.map((cell) => {
+        const copiedCell = cell;
+
+        if (current.some((it) => it === cell.id)) {
+          copiedCell.isClear = true;
+          copiedCell.color = null;
         }
-        return item;
+        return cell;
       })
     );
-  };
-
-  const moveDown = () => {
-    erase();
-    currentPosition += FIELD_SIZE.wide;
-    draw();
-    freeze();
   };
 
   const moveRight = () => {
     const current = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to right on 1 step
-    if (current.some((it) => (it + 1) % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'right')) {
+    if (current.some((coord) => (coord + 1) % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'right')) {
       return;
     }
+
     currentPosition += 1;
   };
 
@@ -113,43 +112,48 @@ const Tetris = () => {
     const current = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to left on 1 step
-    if (current.some((it) => it % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'left')) {
+    if (current.some((coord) => coord % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'left')) {
       return;
     }
+
     currentPosition -= 1;
   };
 
-  // Speed Tetramino in 2 times
+  // Boost throwing a tetramino in 2 times
   const throwDown = () => {
-    const nextStep = currentPosition + FIELD_SIZE.wide * 3;
+    const nextPosition = currentPosition + FIELD_SIZE.wide * 3;
+
+    // Check empty cells to be allowed to throw a tetramino down
     const isFree = currentTetramino
-      .map((it) => {
+      .map((coord) => {
         if (frozenCells.length === 0) {
           return false;
         }
 
-        return frozenCells.map((el) => el.id).includes(it + nextStep);
+        return frozenCells.map((cell) => cell.id).includes(coord + nextPosition);
       })
-      .every((item) => item === false);
+      .every((frozenCell) => frozenCell === false);
 
-    if (isFree && nextStep + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
+    if (isFree && nextPosition + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
       currentPosition += FIELD_SIZE.wide * 2;
     }
   };
 
+  // Rotate a tetramino around itself within amount of rotation
   const rotateFigure = () => {
     // Find next rotation of current tetramino
     const nextRotation = currentFigure[
-      currentRotation + 1 > 3 ? 0 : currentRotation + 1
-    ].map((it) => it + currentPosition);
+      currentRotation + 1 > AMOUNT_OF_ROTATION - 1 ? 0 : currentRotation + 1
+    ].map((coord) => coord + currentPosition);
 
     const isRight = nextRotation
-      .map((it) => it % FIELD_SIZE.wide === 0)
-      .every((it) => it === false);
+      .map((coord) => coord % FIELD_SIZE.wide === 0)
+      .every((frozenCell) => frozenCell === false);
     const isLeft = nextRotation
-      .map((it) => (it + 1) % FIELD_SIZE.wide === 0)
-      .every((it) => it === false);
+      .map((coord) => (coord + 1) % FIELD_SIZE.wide === 0)
+      .every((frozenCell) => frozenCell === false); 
 
+    // Limit rotation of a tetramino if its coords get out of left/right edge
     if (
       ((currentPosition + 1) % FIELD_SIZE.wide < FIELD_SIZE.wide / 2 &&
         !isLeft) ||
@@ -162,9 +166,12 @@ const Tetris = () => {
     currentTetramino = currentFigure[currentRotation];
   };
 
+  // Delete a line if each cell of one is fulled by tetramino
   const addScore = () => {
     let counter = 0;
-    const lines = new Array(FIELD_SIZE.height).fill([]).map((__) => {
+
+    // Divide the field onto lines contain 10 cells
+    const lines = new Array(FIELD_SIZE.height).fill([]).map(() => {
       counter += FIELD_SIZE.wide;
       return fieldCell.slice(
         counter === FIELD_SIZE.wide ? 0 : counter - FIELD_SIZE.wide,
@@ -172,24 +179,25 @@ const Tetris = () => {
       );
     });
 
+    // Finding fulled lines
     const isFulled = lines.map((line) => {
-      return line.map((it) => it.isClear).every((item) => item === false);
+      return line.map((cell) => cell.isClear).every((filledCell) => filledCell === false);
     });
 
-    // console.log(isFulled);
+    // Get list of fulled lines
     const numberFulledLines = isFulled
-      .map((it, i) => {
-        if (it === true) {
+      .map((line, i) => {
+        if (line === true) {
           return i;
         }
         return '';
       })
-      .filter((it) => it !== '');
+      .filter((numb) => numb !== '');
 
     if (numberFulledLines.length > 0) {
       const emptyLine = new Array(FIELD_SIZE.wide * numberFulledLines.length)
         .fill('')
-        .map((item, i) => {
+        .map((__, i) => {
           return {
             id: i,
             isClear: true,
@@ -217,8 +225,9 @@ const Tetris = () => {
           fieldCell.unshift(emptyLine[i]);
         }
       });
-      fieldCell.forEach((el, i) => {
-        el.id = i;
+      fieldCell.forEach((cell, i) => {
+        const copiedCell = cell
+        copiedCell.id = i;
       });
 
       setScore((prev) => prev + numberFulledLines.length * SCORE_VALUE);
@@ -229,43 +238,46 @@ const Tetris = () => {
   const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
     const bottomPoint =
-      fieldCell.slice().indexOf(fieldCell.find((it) => it.isBottom)) -
+      fieldCell.slice().indexOf(fieldCell.find((cell) => cell.isBottom)) -
       FIELD_SIZE.wide;
 
-    frozenCells = fieldCell.slice().filter((it) => it.isFrozen === true);
+    frozenCells = fieldCell.slice().filter((cell) => cell.isFrozen === true);
     const nextMove = currentPosition + FIELD_SIZE.wide;
 
     // Define the next line from tetramino is free or there is a another figure
     const isFree = currentTetramino
-      .map((it) => {
+      .map((coord) => {
         if (frozenCells.length === 0) {
           return false;
         }
 
-        return frozenCells.map((el) => el.id).includes(it + nextMove);
+        return frozenCells.map((cell) => cell.id).includes(coord + nextMove);
       })
-      .every((item) => item === false);
+      .every((frozenCell) => frozenCell === false);
 
     // Stop tetramino
     if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
       const current = getCurrentPosition(currentTetramino);
 
       setFieldCell(
-        fieldCell.map((item) => {
-          if (current.some((el) => el === item.id)) {
-            item.isFrozen = true;
+        fieldCell.map((cell) => {
+          const copiedCell = cell;
+          if (current.some((coord) => coord === cell.id)) {
+            copiedCell.isFrozen = true;
           }
-          return item;
+          return copiedCell;
         })
       );
 
       // Reset current tetramino and create new one
       currentPosition = 4;
 
+      // Change current tetramino
       currentFigure = followingFigure;
       currentTetramino = followingTetramino;
       randomColor = followingColor;
 
+      // Create a new following tetramino
       followingFigure = createRandomFigure();
       followingTetramino = followingFigure[currentRotation];
       followingColor = generateRandomColor();
@@ -283,7 +295,7 @@ const Tetris = () => {
 
   const gameOver = () => {
     const current = getCurrentPosition(currentTetramino);
-    const isEmpty = current.map((it) => fieldCell[it].isFrozen).every((el) => el === false)
+    const isEmpty = current.map((coord) => fieldCell[coord].isFrozen).every((frozenCell) => frozenCell === false)
 
     if (!isEmpty) {
       currentTetramino = [];
@@ -293,36 +305,42 @@ const Tetris = () => {
 
   const onKeyDown = (evt) => {
     const { key } = evt;
-    if (key === KEYBOARD_KEYS.right) {
+
+    const executeKeyFunction = (cb) => {
       erase();
-      moveRight();
+      cb()
       draw();
-    } else if (key === KEYBOARD_KEYS.left) {
-      erase();
-      moveLeft();
-      draw();
-    } else if (key === KEYBOARD_KEYS.down) {
-      erase();
-      throwDown();
-      draw();
-    } else if (key === KEYBOARD_KEYS.up) {
-      erase();
-      rotateFigure();
-      draw();
+    }
+
+    switch(true) {
+      case (key === KEYBOARD_KEYS.right):
+        executeKeyFunction(moveRight);
+        break;
+      case (key === KEYBOARD_KEYS.left): 
+        executeKeyFunction(moveLeft);
+        break;
+      case (key === KEYBOARD_KEYS.down):
+        executeKeyFunction(throwDown);
+        break;
+      default:
+        executeKeyFunction(rotateFigure);
     }
   };
 
+  const moveDown = () => {
+    erase();
+    currentPosition += FIELD_SIZE.wide;
+    draw();
+    freeze();
+  };
+
   React.useEffect(() => {
-    // const timer = setTimeout(() => {
-    //   draw();
-    // }, 100);
     const timer2 = setInterval(() => {
       moveDown();
       gameOver();
     }, 500);
 
     return () => {
-      // clearTimeout(timer);
       clearInterval(timer2);
     };
   }, []);
