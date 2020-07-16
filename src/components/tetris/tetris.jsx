@@ -1,4 +1,5 @@
 import BattleField from '../battle-field/battle-field';
+import GameOverScreen from '../game-over-screen/game-over-screen';
 import UserDashboard from '../user-dashboard/user-dashboard';
 import {
   FIELD_SIZE,
@@ -13,7 +14,7 @@ import {
   currentRotation,
 } from '../../tetramino';
 
-const Tetris = () => {
+const Tetris = ({ cb }) => {
   // define amount of playground cells
   const fieldSquare = FIELD_SIZE.wide * FIELD_SIZE.height;
 
@@ -40,7 +41,7 @@ const Tetris = () => {
   let currentFigure = createRandomFigure();
   let currentTetramino = currentFigure[currentRotation];
   let randomColor = generateRandomColor();
-  
+
   // create next tetramino for showing into user's dashboard
   let followingFigure = createRandomFigure();
   let followingTetramino = followingFigure[currentRotation];
@@ -59,18 +60,22 @@ const Tetris = () => {
 
   // Check empty cells near a current tetramino (right/left)
   const checkFreePosition = (tetramino, step) => {
-    return tetramino.map((coord) => {
-      return fieldCell[step === 'right' ? coord + 1 : coord - 1].isFrozen
-    }).every((frozenCell) => frozenCell === false)
-  }
+    return tetramino
+      .map((coord) => {
+        return fieldCell[step === 'right' ? coord + 1 : coord - 1].isFrozen;
+      })
+      .every((frozenCell) => frozenCell === false);
+  };
 
   // Draw current tetramino onto the field
   const draw = () => {
     setFieldCell(
       fieldCell.map((cell) => {
         const copiedCell = cell;
-        
-        if (currentTetramino.some((coord) => coord + currentPosition === cell.id)) {
+
+        if (
+          currentTetramino.some((coord) => coord + currentPosition === cell.id)
+        ) {
           copiedCell.isClear = false;
           copiedCell.color = randomColor;
         }
@@ -101,7 +106,10 @@ const Tetris = () => {
     const current = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to right on 1 step
-    if (current.some((coord) => (coord + 1) % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'right')) {
+    if (
+      current.some((coord) => (coord + 1) % FIELD_SIZE.wide === 0) ||
+      !checkFreePosition(current, 'right')
+    ) {
       return;
     }
 
@@ -112,7 +120,10 @@ const Tetris = () => {
     const current = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to left on 1 step
-    if (current.some((coord) => coord % FIELD_SIZE.wide === 0) || !checkFreePosition(current, 'left')) {
+    if (
+      current.some((coord) => coord % FIELD_SIZE.wide === 0) ||
+      !checkFreePosition(current, 'left')
+    ) {
       return;
     }
 
@@ -130,11 +141,16 @@ const Tetris = () => {
           return false;
         }
 
-        return frozenCells.map((cell) => cell.id).includes(coord + nextPosition);
+        return frozenCells
+          .map((cell) => cell.id)
+          .includes(coord + nextPosition);
       })
       .every((frozenCell) => frozenCell === false);
 
-    if (isFree && nextPosition + lowerPoint < fieldCell.length - FIELD_SIZE.wide) {
+    if (
+      isFree &&
+      nextPosition + lowerPoint < fieldCell.length - FIELD_SIZE.wide
+    ) {
       currentPosition += FIELD_SIZE.wide * 2;
     }
   };
@@ -151,7 +167,7 @@ const Tetris = () => {
       .every((frozenCell) => frozenCell === false);
     const isLeft = nextRotation
       .map((coord) => (coord + 1) % FIELD_SIZE.wide === 0)
-      .every((frozenCell) => frozenCell === false); 
+      .every((frozenCell) => frozenCell === false);
 
     // Limit rotation of a tetramino if its coords get out of left/right edge
     if (
@@ -181,7 +197,9 @@ const Tetris = () => {
 
     // Finding fulled lines
     const isFulled = lines.map((line) => {
-      return line.map((cell) => cell.isClear).every((filledCell) => filledCell === false);
+      return line
+        .map((cell) => cell.isClear)
+        .every((filledCell) => filledCell === false);
     });
 
     // Get list of fulled lines
@@ -226,7 +244,7 @@ const Tetris = () => {
         }
       });
       fieldCell.forEach((cell, i) => {
-        const copiedCell = cell
+        const copiedCell = cell;
         copiedCell.id = i;
       });
 
@@ -295,7 +313,9 @@ const Tetris = () => {
 
   const gameOver = () => {
     const current = getCurrentPosition(currentTetramino);
-    const isEmpty = current.map((coord) => fieldCell[coord].isFrozen).every((frozenCell) => frozenCell === false)
+    const isEmpty = current
+      .map((coord) => fieldCell[coord].isFrozen)
+      .every((frozenCell) => frozenCell === false);
 
     if (!isEmpty) {
       currentTetramino = [];
@@ -306,20 +326,20 @@ const Tetris = () => {
   const onKeyDown = (evt) => {
     const { key } = evt;
 
-    const executeKeyFunction = (cb) => {
+    const executeKeyFunction = (func) => {
       erase();
-      cb()
+      func();
       draw();
-    }
+    };
 
-    switch(true) {
-      case (key === KEYBOARD_KEYS.right):
+    switch (true) {
+      case key === KEYBOARD_KEYS.right:
         executeKeyFunction(moveRight);
         break;
-      case (key === KEYBOARD_KEYS.left): 
+      case key === KEYBOARD_KEYS.left:
         executeKeyFunction(moveLeft);
         break;
-      case (key === KEYBOARD_KEYS.down):
+      case key === KEYBOARD_KEYS.down:
         executeKeyFunction(throwDown);
         break;
       default:
@@ -360,13 +380,15 @@ const Tetris = () => {
   return (
     <main className="html-wrapper main">
       <BattleField field={fieldCell} />
-      <UserDashboard
-        score={score}
-        color={randomColor}
-        nextFigure={nextTetramino}
-      />
+      {!isGameOver && (
+        <UserDashboard
+          score={score}
+          color={randomColor}
+          nextFigure={nextTetramino}
+        />
+      )}
 
-      {isGameOver && <p>GAME OVER</p>}
+      {isGameOver && <GameOverScreen score={score} cb={cb} />}
     </main>
   );
 };
