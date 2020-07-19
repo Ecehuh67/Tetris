@@ -1,4 +1,6 @@
-const BattleField = ({ field }) => {
+import type { FieldProps } from '../../ts-types';
+
+const BattleField: React.FC = ({ field }: FieldProps) => {
   return (
     <section className="main__field">
       {field.map((item) => {

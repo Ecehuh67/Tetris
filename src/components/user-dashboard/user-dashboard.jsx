@@ -1,6 +1,6 @@
 import LittleField from '../little-field/little-field';
 
-const UserDashboard = ({ score, color, nextFigure }) => {
+const UserDashboard = ({ score, nextFigure }) => {
   const tetrField = new Array(16).fill('').map((__, i) => {
     return {
       id: i,
@@ -32,19 +32,21 @@ const UserDashboard = ({ score, color, nextFigure }) => {
           break;
       }
 
+      // eslint-disable-next-line consistent-return
       return newCor;
     });
   }
 
   tetrField.forEach((item) => {
+    const copiedItem = item;
     if (nextFigure === null) {
       return;
     }
 
     const isColored = convertedFigure.includes(item.id);
     if (isColored) {
-      item.isClear = false;
-      item.color = nextFigure.color;
+      copiedItem.isClear = false;
+      copiedItem.color = nextFigure.color;
     }
   });
 
