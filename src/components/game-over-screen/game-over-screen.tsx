@@ -1,4 +1,6 @@
-const GameOverScreen = ({ score, cb }) => {
+import { GameOverProps } from '../../ts-types';
+
+const GameOverScreen: React.FC = ({ score, cb }: GameOverProps) => {
   return (
     <section className="main__layout">
       <span className="main__layout-text">GAME OVER</span>

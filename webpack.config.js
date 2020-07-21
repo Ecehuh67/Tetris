@@ -3,13 +3,13 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './src/index.jsx',
+  entry: './src/index.tsx',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.json'],
+    extensions: ['.js', '.jsx', '.json', 'tsx', 'ts'],
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'public'),
@@ -50,7 +50,9 @@ module.exports = {
       },
       {
         test: /\.(tsx|ts)?$/,
-        loader: `ts-loader`,
+        use: {
+          loader: `ts-loader`,
+        },
       },
     ],
   },

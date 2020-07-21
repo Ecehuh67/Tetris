@@ -3,7 +3,7 @@ import type { FieldProps } from '../../ts-types';
 const BattleField: React.FC = ({ field }: FieldProps) => {
   return (
     <section className="main__field">
-      {field.map((item) => {
+      {field.map((item, i) => {
         return (
           <div
             className={`${
@@ -13,7 +13,7 @@ const BattleField: React.FC = ({ field }: FieldProps) => {
                     1
                   )}`
             } ${item.isBottom ? 'main__field-item--bottom' : ''}`}
-            key={new Date() * Math.random()}
+            key={i * Math.random()}
           />
         );
       })}

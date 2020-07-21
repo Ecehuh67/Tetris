@@ -2,12 +2,24 @@
   'extends': ['airbnb', 'prettier', 'prettier/react'],
   'env': { 'es6': true, 'node': true },
   'globals': { 'React': true, 'ReactDOM': true, 'document': true },
+  'settings':
+    {
+      'import/resolver':
+        { node: { extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'] } },
+    },
   'rules':
     {
       'react/prop-types': 0,
       'react/destructuring-assignment': 0,
       'jsx-a11y/label-has-associated-control': 0,
       'import/no-named-as-default': 0,
+      'react/jsx-filename-extension': 0,
+      'import/extensions':
+        [
+          'error',
+          'ignorePackages',
+          { 'js': 'never', 'jsx': 'never', 'tsx': 'never', 'ts': 'never' },
+        ],
     },
   'parserOptions': { 'ecmaFeatures': { 'jsx': true }, 'sourceType': module },
 }
