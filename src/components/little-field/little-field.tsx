@@ -1,6 +1,6 @@
 import type { UserFieldProps } from '../../ts-types';
 
-const LittleField: React.FC = ({ field }: UserFieldProps) => {
+const LittleField: React.FC<UserFieldProps> = ({ field }) => {
   return (
     <section className="little-field">
       {field.map((item) => {
@@ -13,7 +13,7 @@ const LittleField: React.FC = ({ field }: UserFieldProps) => {
                     1
                   )}`
             }`}
-            key={new Date() * Math.random()}
+            key={new Date().toString() + Math.random()}
           />
         );
       })}

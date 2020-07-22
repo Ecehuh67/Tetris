@@ -9,7 +9,7 @@ module.exports = {
     path: path.resolve(__dirname, 'public'),
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.json', 'tsx', 'ts'],
+    extensions: ['.js', '.jsx', '.json', 'ts', 'tsx'],
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'public'),
@@ -34,6 +34,12 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
       },
       {
+        test: /\.(tsx|ts)?$/,
+        use: {
+          loader: `ts-loader`,
+        },
+      },
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
@@ -47,12 +53,6 @@ module.exports = {
             loader: 'file-loader',
           },
         ],
-      },
-      {
-        test: /\.(tsx|ts)?$/,
-        use: {
-          loader: `ts-loader`,
-        },
       },
     ],
   },

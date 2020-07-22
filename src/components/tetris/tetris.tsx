@@ -1,6 +1,7 @@
 import BattleField from '../battle-field/battle-field';
 import GameOverScreen from '../game-over-screen/game-over-screen';
 import UserDashboard from '../user-dashboard/user-dashboard';
+import { StartScreenProps, PlayField, FieldProps } from '../../ts-types';
 import {
   FIELD_SIZE,
   KEYBOARD_KEYS,
@@ -14,9 +15,9 @@ import {
   currentRotation,
 } from '../../tetramino';
 
-const Tetris = ({ cb }) => {
+const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   // define amount of playground cells
-  const fieldSquare = FIELD_SIZE.wide * FIELD_SIZE.height;
+  const fieldSquare: number = FIELD_SIZE.wide * FIELD_SIZE.height;
 
   // abstract Array for rendering figures
   const initialFieldCells = new Array(fieldSquare + FIELD_SIZE.wide)
@@ -38,14 +39,14 @@ const Tetris = ({ cb }) => {
 
   // entry options of the game
   let currentPosition = 4;
-  let currentFigure = createRandomFigure();
-  let currentTetramino = currentFigure[currentRotation];
-  let randomColor = generateRandomColor();
+  let currentFigure: number[][] = createRandomFigure();
+  let currentTetramino: number[] = currentFigure[currentRotation];
+  let randomColor: string = generateRandomColor();
 
   // create next tetramino for showing into user's dashboard
-  let followingFigure = createRandomFigure();
-  let followingTetramino = followingFigure[currentRotation];
-  let followingColor = generateRandomColor();
+  let followingFigure: number[][] = createRandomFigure();
+  let followingTetramino: number[] = followingFigure[currentRotation];
+  let followingColor: string = generateRandomColor();
 
   // Cells which were colored by tetraminos
   let frozenCells = [];
@@ -208,9 +209,9 @@ const Tetris = ({ cb }) => {
         if (line === true) {
           return i;
         }
-        return '';
+        return null;
       })
-      .filter((numb) => numb !== '');
+      .filter((numb) => numb !== null);
 
     if (numberFulledLines.length > 0) {
       const emptyLine = new Array(FIELD_SIZE.wide * numberFulledLines.length)
@@ -381,11 +382,7 @@ const Tetris = ({ cb }) => {
     <main className="html-wrapper main">
       <BattleField field={fieldCell} />
       {!isGameOver && (
-        <UserDashboard
-          score={score}
-          color={randomColor}
-          nextFigure={nextTetramino}
-        />
+        <UserDashboard score={score} nextFigure={nextTetramino} />
       )}
 
       {isGameOver && <GameOverScreen score={score} cb={cb} />}

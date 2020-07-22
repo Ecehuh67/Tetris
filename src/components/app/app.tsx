@@ -3,7 +3,7 @@ import Tetris from '../tetris/tetris';
 import StartScreen from '../start-screen/start-screen';
 
 const App: React.FC = () => {
-  const [isStarted, setStartGame] = React.useState<boolean>(false);
+  const [isStarted, setStartGame] = React.useState(false);
   return (
     <>
       {isStarted && <Tetris cb={setStartGame} />}

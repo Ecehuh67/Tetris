@@ -1,20 +1,28 @@
-export const FIELD_SIZE = {
+import { FieldSize, KeyboadrKeys } from './ts-types';
+
+export const FIELD_SIZE: FieldSize = {
   wide: 10,
   height: 15,
 };
 
-export const COLORS = ['#ff1d58', '#0049B7', '#fff685', '#8458B3', '#f37736'];
-export const AMOUNT_OF_ROTATION = 4;
-export const SCORE_VALUE = 10;
+export const COLORS: string[] = [
+  '#ff1d58',
+  '#0049B7',
+  '#fff685',
+  '#8458B3',
+  '#f37736',
+];
+export const AMOUNT_OF_ROTATION: number = 4;
+export const SCORE_VALUE: number = 10;
 
-export const KEYBOARD_KEYS = {
+export const KEYBOARD_KEYS: KeyboadrKeys = {
   right: 'ArrowRight',
   left: 'ArrowLeft',
   down: 'ArrowDown',
   up: 'ArrowUp',
 };
 
-const lTetromino = [
+const lTetromino: number[][] = [
   [1, 2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1],
   [
     FIELD_SIZE.wide,
@@ -31,14 +39,14 @@ const lTetromino = [
   ],
 ];
 
-const squareTetramino = [
+const squareTetramino: number[][] = [
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
   [0, 1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1],
 ];
 
-const tTetramino = [
+const tTetramino: number[][] = [
   [1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
   [
@@ -50,7 +58,7 @@ const tTetramino = [
   [1, FIELD_SIZE.wide, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1],
 ];
 
-const iTetramino = [
+const iTetramino: number[][] = [
   [1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide * 2 + 1, FIELD_SIZE.wide * 3 + 1],
   [
     FIELD_SIZE.wide,
@@ -67,14 +75,14 @@ const iTetramino = [
   ],
 ];
 
-const zTetramino = [
+const zTetramino: number[][] = [
   [0, 1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
   [0, 1, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2],
   [2, FIELD_SIZE.wide + 1, FIELD_SIZE.wide + 2, FIELD_SIZE.wide * 2 + 1],
 ];
 
-export const tetraminos = [
+export const tetraminos: number[][][] = [
   lTetromino,
   squareTetramino,
   tTetramino,

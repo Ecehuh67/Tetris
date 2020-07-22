@@ -1,10 +1,12 @@
 import LittleField from '../little-field/little-field';
+import type { UserDashboardProps } from '../../ts-types';
 
-const UserDashboard = ({ score, nextFigure }) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({ score, nextFigure }) => {
   const tetrField = new Array(16).fill('').map((__, i) => {
     return {
       id: i,
       isClear: true,
+      color: null,
     };
   });
 

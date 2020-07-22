@@ -1,4 +1,6 @@
-const StartScreen = ({ cb }) => {
+import { StartScreenProps } from '../../ts-types';
+
+const StartScreen: React.FC<StartScreenProps> = ({ cb }) => {
   return (
     <main className="html-wrapper main">
       <button
