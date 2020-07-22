@@ -1,4 +1,4 @@
-import { FieldSize, KeyboadrKeys } from './ts-types';
+import { FieldSize, KeyboardKeys } from './ts-types';
 
 export const FIELD_SIZE: FieldSize = {
   wide: 10,
@@ -15,7 +15,7 @@ export const COLORS: string[] = [
 export const AMOUNT_OF_ROTATION: number = 4;
 export const SCORE_VALUE: number = 10;
 
-export const KEYBOARD_KEYS: KeyboadrKeys = {
+export const KEYBOARD_KEYS: KeyboardKeys = {
   right: 'ArrowRight',
   left: 'ArrowLeft',
   down: 'ArrowDown',

@@ -39,7 +39,7 @@ export type FieldSize = {
   height: number;
 };
 
-export type KeyboadrKeys = {
+export type KeyboardKeys = {
   right: string;
   left: string;
   down: string;
@@ -48,6 +48,16 @@ export type KeyboadrKeys = {
 
 export type PlayField = {
   id: number;
+  isClear: boolean;
   isBottom: boolean;
   isFrozen: boolean;
+  color: string;
 };
+
+export type FrozenCells = {
+  id: number;
+  isClear: boolean;
+  isBottom: boolean;
+  isFrozen: boolean;
+  color: string;
+}[];

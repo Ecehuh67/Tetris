@@ -1,7 +1,12 @@
 import BattleField from '../battle-field/battle-field';
 import GameOverScreen from '../game-over-screen/game-over-screen';
 import UserDashboard from '../user-dashboard/user-dashboard';
-import { StartScreenProps, PlayField, FieldProps } from '../../ts-types';
+import {
+  StartScreenProps,
+  PlayField,
+  FieldProps,
+  FrozenCells,
+} from '../../ts-types';
 import {
   FIELD_SIZE,
   KEYBOARD_KEYS,
@@ -49,29 +54,29 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   let followingColor: string = generateRandomColor();
 
   // Cells which were colored by tetraminos
-  let frozenCells = [];
+  let frozenCells: FrozenCells = [];
 
   // The lowest point of tetramino
-  let lowerPoint = null;
+  let lowerPoint: null | number = null;
 
   // Get coords of tetramino
-  const getCurrentPosition = (tetramino) => {
-    return tetramino.map((coord) => coord + currentPosition);
+  const getCurrentPosition = (tetramino: number[]) => {
+    return tetramino.map((coord: number) => coord + currentPosition);
   };
 
   // Check empty cells near a current tetramino (right/left)
-  const checkFreePosition = (tetramino, step) => {
+  const checkFreePosition = (tetramino: number[], step: string) => {
     return tetramino
       .map((coord) => {
         return fieldCell[step === 'right' ? coord + 1 : coord - 1].isFrozen;
       })
-      .every((frozenCell) => frozenCell === false);
+      .every((frozenCell: boolean) => frozenCell === false);
   };
 
   // Draw current tetramino onto the field
   const draw = () => {
     setFieldCell(
-      fieldCell.map((cell) => {
+      fieldCell.map((cell: PlayField) => {
         const copiedCell = cell;
 
         if (
@@ -88,13 +93,15 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
 
   // Delete current tetramino from the field
   const erase = () => {
-    const current = currentTetramino.map((it) => it + currentPosition);
+    const current: number[] = currentTetramino.map(
+      (coord) => coord + currentPosition
+    );
 
     setFieldCell(
-      fieldCell.map((cell) => {
+      fieldCell.map((cell: PlayField) => {
         const copiedCell = cell;
 
-        if (current.some((it) => it === cell.id)) {
+        if (current.some((coord: number) => coord === cell.id)) {
           copiedCell.isClear = true;
           copiedCell.color = null;
         }
@@ -104,11 +111,11 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   };
 
   const moveRight = () => {
-    const current = getCurrentPosition(currentTetramino);
+    const current: number[] = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to right on 1 step
     if (
-      current.some((coord) => (coord + 1) % FIELD_SIZE.wide === 0) ||
+      current.some((coord: number) => (coord + 1) % FIELD_SIZE.wide === 0) ||
       !checkFreePosition(current, 'right')
     ) {
       return;
@@ -118,11 +125,11 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   };
 
   const moveLeft = () => {
-    const current = getCurrentPosition(currentTetramino);
+    const current: number[] = getCurrentPosition(currentTetramino);
 
     // Define the right edge of playground and also check possibility of changing position to left on 1 step
     if (
-      current.some((coord) => coord % FIELD_SIZE.wide === 0) ||
+      current.some((coord: number) => coord % FIELD_SIZE.wide === 0) ||
       !checkFreePosition(current, 'left')
     ) {
       return;
@@ -133,17 +140,17 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
 
   // Boost throwing a tetramino in 2 times
   const throwDown = () => {
-    const nextPosition = currentPosition + FIELD_SIZE.wide * 3;
+    const nextPosition: number = currentPosition + FIELD_SIZE.wide * 3;
 
     // Check empty cells to be allowed to throw a tetramino down
-    const isFree = currentTetramino
-      .map((coord) => {
+    const isFree: boolean = currentTetramino
+      .map((coord: number) => {
         if (frozenCells.length === 0) {
           return false;
         }
 
         return frozenCells
-          .map((cell) => cell.id)
+          .map((cell: PlayField) => cell.id)
           .includes(coord + nextPosition);
       })
       .every((frozenCell) => frozenCell === false);
@@ -159,15 +166,15 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   // Rotate a tetramino around itself within amount of rotation
   const rotateFigure = () => {
     // Find next rotation of current tetramino
-    const nextRotation = currentFigure[
+    const nextRotation: number[] = currentFigure[
       currentRotation + 1 > AMOUNT_OF_ROTATION - 1 ? 0 : currentRotation + 1
-    ].map((coord) => coord + currentPosition);
+    ].map((coord: number) => coord + currentPosition);
 
-    const isRight = nextRotation
-      .map((coord) => coord % FIELD_SIZE.wide === 0)
+    const isRight: boolean = nextRotation
+      .map((coord: number) => coord % FIELD_SIZE.wide === 0)
       .every((frozenCell) => frozenCell === false);
-    const isLeft = nextRotation
-      .map((coord) => (coord + 1) % FIELD_SIZE.wide === 0)
+    const isLeft: boolean = nextRotation
+      .map((coord: number) => (coord + 1) % FIELD_SIZE.wide === 0)
       .every((frozenCell) => frozenCell === false);
 
     // Limit rotation of a tetramino if its coords get out of left/right edge
@@ -188,23 +195,25 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
     let counter = 0;
 
     // Divide the field onto lines contain 10 cells
-    const lines = new Array(FIELD_SIZE.height).fill([]).map(() => {
-      counter += FIELD_SIZE.wide;
-      return fieldCell.slice(
-        counter === FIELD_SIZE.wide ? 0 : counter - FIELD_SIZE.wide,
-        counter
-      );
-    });
+    const lines: FieldProps | any[] = new Array(FIELD_SIZE.height)
+      .fill([])
+      .map(() => {
+        counter += FIELD_SIZE.wide;
+        return fieldCell.slice(
+          counter === FIELD_SIZE.wide ? 0 : counter - FIELD_SIZE.wide,
+          counter
+        );
+      });
 
     // Finding fulled lines
-    const isFulled = lines.map((line) => {
+    const isFulled: FieldProps | any[] = lines.map((line) => {
       return line
         .map((cell) => cell.isClear)
         .every((filledCell) => filledCell === false);
     });
 
     // Get list of fulled lines
-    const numberFulledLines = isFulled
+    const numberFulledLines: number[] = isFulled
       .map((line, i) => {
         if (line === true) {
           return i;
@@ -214,7 +223,9 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
       .filter((numb) => numb !== null);
 
     if (numberFulledLines.length > 0) {
-      const emptyLine = new Array(FIELD_SIZE.wide * numberFulledLines.length)
+      const emptyLine: PlayField[] = new Array(
+        FIELD_SIZE.wide * numberFulledLines.length
+      )
         .fill('')
         .map((__, i) => {
           return {
@@ -256,30 +267,32 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   // Stop the current tetramino near bottom/figure and create new one
   const freeze = () => {
     lowerPoint = Math.max(...currentTetramino);
-    const bottomPoint =
+    const bottomPoint: number =
       fieldCell.slice().indexOf(fieldCell.find((cell) => cell.isBottom)) -
       FIELD_SIZE.wide;
 
     frozenCells = fieldCell.slice().filter((cell) => cell.isFrozen === true);
-    const nextMove = currentPosition + FIELD_SIZE.wide;
+    const nextMove: number = currentPosition + FIELD_SIZE.wide;
 
     // Define the next line from tetramino is free or there is a another figure
-    const isFree = currentTetramino
-      .map((coord) => {
+    const isFree: boolean = currentTetramino
+      .map((coord: number) => {
         if (frozenCells.length === 0) {
           return false;
         }
 
-        return frozenCells.map((cell) => cell.id).includes(coord + nextMove);
+        return frozenCells
+          .map((cell: PlayField) => cell.id)
+          .includes(coord + nextMove);
       })
       .every((frozenCell) => frozenCell === false);
 
     // Stop tetramino
     if (currentPosition + lowerPoint >= bottomPoint || !isFree) {
-      const current = getCurrentPosition(currentTetramino);
+      const current: number[] = getCurrentPosition(currentTetramino);
 
       setFieldCell(
-        fieldCell.map((cell) => {
+        fieldCell.map((cell: PlayField) => {
           const copiedCell = cell;
           if (current.some((coord) => coord === cell.id)) {
             copiedCell.isFrozen = true;
@@ -313,9 +326,9 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
   };
 
   const gameOver = () => {
-    const current = getCurrentPosition(currentTetramino);
-    const isEmpty = current
-      .map((coord) => fieldCell[coord].isFrozen)
+    const current: number[] = getCurrentPosition(currentTetramino);
+    const isEmpty: boolean = current
+      .map((coord: number) => fieldCell[coord].isFrozen)
       .every((frozenCell) => frozenCell === false);
 
     if (!isEmpty) {
@@ -324,10 +337,10 @@ const Tetris: React.FC<StartScreenProps> = ({ cb }) => {
     }
   };
 
-  const onKeyDown = (evt) => {
+  const onKeyDown = (evt: KeyboardEvent) => {
     const { key } = evt;
 
-    const executeKeyFunction = (func) => {
+    const executeKeyFunction = (func: () => void) => {
       erase();
       func();
       draw();
